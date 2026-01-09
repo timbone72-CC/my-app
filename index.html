@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live Address Book v0.7</title>
+  <title>Live Address Book v0.8</title>
   <style>
     body { font-family: Arial; margin: 20px; }
     label { display: block; margin-top: 10px; }
-    input, button { padding: 5px; width: 260px; margin-top: 5px; }
+    input, button { padding: 6px; width: 260px; margin-top: 6px; }
     ul { list-style: none; padding: 0; margin-top: 20px; }
     li { padding: 8px; border-bottom: 1px solid #ddd; }
   </style>
 </head>
 <body>
-  <h1>My Live Address Book v0.7</h1>
+  <h1>My Live Address Book v0.8</h1>
 
   <h3>Add Contact</h3>
   <label>
@@ -27,6 +27,7 @@
   </label>
 
   <button onclick="addContact()">Add Contact</button>
+  <button onclick="exportVCF()">Export for Android</button>
 
   <ul id="contacts"></ul>
 
@@ -63,6 +64,34 @@
         li.innerHTML = '<strong>' + c.name + '</strong><br>' + c.phone;
         list.appendChild(li);
       });
+    }
+
+    function exportVCF() {
+      if (contacts.length === 0) {
+        alert('No contacts to export');
+        return;
+      }
+
+      let vcf = '';
+      contacts.forEach(c => {
+        vcf +=
+`BEGIN:VCARD
+VERSION:3.0
+FN:${c.name}
+TEL:${c.phone}
+END:VCARD
+`;
+      });
+
+      const blob = new Blob([vcf], { type: 'text/vcard' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'address-book.vcf';
+      a.click();
+
+      URL.revokeObjectURL(url);
     }
 
     renderContacts();
