@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live Address Book v0.9</title>
+  <title>Live Address Book v1.0</title>
   <style>
     body { font-family: Arial; margin: 20px; }
     label { display: block; margin-top: 10px; }
@@ -16,9 +16,7 @@
       justify-content: space-between;
       align-items: center;
     }
-    .contact {
-      max-width: 200px;
-    }
+    .contact { max-width: 200px; }
     .delete {
       background: #c00;
       color: white;
@@ -29,21 +27,17 @@
   </style>
 </head>
 <body>
-  <h1>My Live Address Book v0.9</h1>
+  <h1>My Live Address Book v1.0</h1>
 
-  <h3>Add Contact</h3>
-  <label>
-    Name:
-    <input id="name" type="text">
-  </label>
-
-  <label>
-    Phone:
-    <input id="phone" type="tel">
-  </label>
+  <h3>Add / Import Contacts</h3>
+  <label>Name: <input id="name" type="text"></label>
+  <label>Phone: <input id="phone" type="tel"></label>
 
   <button onclick="addContact()">Add Contact</button>
   <button onclick="exportVCF()">Export for Android</button>
+
+  <br><br>
+  <input type="file" accept=".vcf" onchange="importVCF(this.files[0])">
 
   <ul id="contacts"></ul>
 
@@ -55,77 +49,65 @@
     }
 
     function addContact() {
-      const name = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-
-      if (!name || !phone) {
-        alert('Please enter name and phone');
-        return;
-      }
-
+      const name = nameInput.value.trim();
+      const phone = phoneInput.value.trim();
+      if (!name || !phone) return alert('Enter name and phone');
       contacts.push({ name, phone });
-      save();
-      renderContacts();
-
-      document.getElementById('name').value = '';
-      document.getElementById('phone').value = '';
+      save(); renderContacts();
+      nameInput.value = phoneInput.value = '';
     }
 
-    function deleteContact(index) {
-      contacts.splice(index, 1);
-      save();
-      renderContacts();
+    function deleteContact(i) {
+      contacts.splice(i, 1);
+      save(); renderContacts();
     }
 
     function renderContacts() {
-      const list = document.getElementById('contacts');
-      list.innerHTML = '';
-
-      contacts.forEach((c, index) => {
+      contactsList.innerHTML = '';
+      contacts.forEach((c, i) => {
         const li = document.createElement('li');
-
-        const info = document.createElement('div');
-        info.className = 'contact';
-        info.innerHTML = '<strong>' + c.name + '</strong><br>' + c.phone;
-
-        const del = document.createElement('button');
-        del.className = 'delete';
-        del.textContent = 'Delete';
-        del.onclick = () => deleteContact(index);
-
-        li.appendChild(info);
-        li.appendChild(del);
-        list.appendChild(li);
+        li.innerHTML =
+          `<div class="contact"><strong>${c.name}</strong><br>${c.phone}</div>
+           <button class="delete" onclick="deleteContact(${i})">Delete</button>`;
+        contactsList.appendChild(li);
       });
     }
 
     function exportVCF() {
-      if (contacts.length === 0) {
-        alert('No contacts to export');
-        return;
-      }
-
+      if (!contacts.length) return alert('No contacts');
       let vcf = '';
       contacts.forEach(c => {
-        vcf +=
-`BEGIN:VCARD
+        vcf += `BEGIN:VCARD
 VERSION:3.0
 FN:${c.name}
 TEL:${c.phone}
 END:VCARD
 `;
       });
-
-      const blob = new Blob([vcf], { type: 'text/vcard' });
-      const url = URL.createObjectURL(blob);
-
       const a = document.createElement('a');
-      a.href = url;
+      a.href = URL.createObjectURL(new Blob([vcf], { type: 'text/vcard' }));
       a.download = 'address-book.vcf';
       a.click();
-
-      URL.revokeObjectURL(url);
     }
+
+    function importVCF(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const cards = e.target.result.split('BEGIN:VCARD').slice(1);
+        cards.forEach(card => {
+          const name = (card.match(/FN:(.*)/) || [])[1];
+          const phone = (card.match(/TEL.*:(.*)/) || [])[1];
+          if (name && phone) contacts.push({ name, phone });
+        });
+        save(); renderContacts();
+      };
+      reader.readAsText(file);
+    }
+
+    const nameInput = document.getElementById('name');
+    const phoneInput = document.getElementById('phone');
+    const contactsList = document.getElementById('contacts');
 
     renderContacts();
   </script>
