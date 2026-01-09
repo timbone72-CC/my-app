@@ -3,17 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live Address Book v0.8</title>
+  <title>Live Address Book v0.9</title>
   <style>
     body { font-family: Arial; margin: 20px; }
     label { display: block; margin-top: 10px; }
     input, button { padding: 6px; width: 260px; margin-top: 6px; }
     ul { list-style: none; padding: 0; margin-top: 20px; }
-    li { padding: 8px; border-bottom: 1px solid #ddd; }
+    li {
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .contact {
+      max-width: 200px;
+    }
+    .delete {
+      background: #c00;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <h1>My Live Address Book v0.8</h1>
+  <h1>My Live Address Book v0.9</h1>
 
   <h3>Add Contact</h3>
   <label>
@@ -55,13 +71,30 @@
       document.getElementById('phone').value = '';
     }
 
+    function deleteContact(index) {
+      contacts.splice(index, 1);
+      save();
+      renderContacts();
+    }
+
     function renderContacts() {
       const list = document.getElementById('contacts');
       list.innerHTML = '';
 
-      contacts.forEach(c => {
+      contacts.forEach((c, index) => {
         const li = document.createElement('li');
-        li.innerHTML = '<strong>' + c.name + '</strong><br>' + c.phone;
+
+        const info = document.createElement('div');
+        info.className = 'contact';
+        info.innerHTML = '<strong>' + c.name + '</strong><br>' + c.phone;
+
+        const del = document.createElement('button');
+        del.className = 'delete';
+        del.textContent = 'Delete';
+        del.onclick = () => deleteContact(index);
+
+        li.appendChild(info);
+        li.appendChild(del);
         list.appendChild(li);
       });
     }
