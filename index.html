@@ -1,28 +1,64 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Live Todo v0.3</title>
-        <style>
-            body {
-                font-family: Arial;
-                margin: 20px;
-            }
-            ul {
-                list-style: none;
-                padding: 0;
-            }
-            li {
-                padding: 5px;
-                border-bottom: 1px solid #ddd;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>My Live Todo v0.3</h1>
-        <ul>
-            <li>✓ First todo</li>
-        </ul>
-    </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Address Book v0.6</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    label { display: block; margin-top: 10px; }
+    input, button { padding: 5px; width: 260px; margin-top: 5px; }
+    ul { list-style: none; padding: 0; margin-top: 20px; }
+    li { padding: 8px; border-bottom: 1px solid #ddd; }
+  </style>
+</head>
+<body>
+  <h1>My Live Address Book v0.6</h1>
+
+  <h3>Add Contact</h3>
+  <label>
+    Name:
+    <input id="name" type="text" placeholder="John Doe">
+  </label>
+
+  <label>
+    Phone:
+    <input id="phone" type="tel" placeholder="5551234567">
+  </label>
+
+  <button onclick="addContact()">Add Contact</button>
+
+  <ul id="contacts"></ul>
+
+  <script>
+    const contacts = [];
+
+    function addContact() {
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+
+      if (!name || !phone) {
+        alert('Please enter name and phone');
+        return;
+      }
+
+      contacts.push({ name, phone });
+      renderContacts();
+
+      document.getElementById('name').value = '';
+      document.getElementById('phone').value = '';
+    }
+
+    function renderContacts() {
+      const list = document.getElementById('contacts');
+      list.innerHTML = '';
+
+      contacts.forEach(c => {
+        const li = document.createElement('li');
+        li.innerHTML = '<strong>' + c.name + '</strong><br>' + c.phone;
+        list.appendChild(li);
+      });
+    }
+  </script>
+</body>
 </html>
