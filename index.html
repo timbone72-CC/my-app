@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live Address Book v0.6</title>
+  <title>Live Address Book v0.7</title>
   <style>
     body { font-family: Arial; margin: 20px; }
     label { display: block; margin-top: 10px; }
@@ -13,17 +13,17 @@
   </style>
 </head>
 <body>
-  <h1>My Live Address Book v0.6</h1>
+  <h1>My Live Address Book v0.7</h1>
 
   <h3>Add Contact</h3>
   <label>
     Name:
-    <input id="name" type="text" placeholder="John Doe">
+    <input id="name" type="text">
   </label>
 
   <label>
     Phone:
-    <input id="phone" type="tel" placeholder="5551234567">
+    <input id="phone" type="tel">
   </label>
 
   <button onclick="addContact()">Add Contact</button>
@@ -31,7 +31,11 @@
   <ul id="contacts"></ul>
 
   <script>
-    const contacts = [];
+    let contacts = JSON.parse(localStorage.getItem('contacts')) || [];
+
+    function save() {
+      localStorage.setItem('contacts', JSON.stringify(contacts));
+    }
 
     function addContact() {
       const name = document.getElementById('name').value.trim();
@@ -43,6 +47,7 @@
       }
 
       contacts.push({ name, phone });
+      save();
       renderContacts();
 
       document.getElementById('name').value = '';
@@ -59,6 +64,8 @@
         list.appendChild(li);
       });
     }
+
+    renderContacts();
   </script>
 </body>
 </html>
